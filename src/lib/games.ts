@@ -1,4 +1,4 @@
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, and, inArray } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
@@ -24,6 +24,12 @@ type GameSelectionRow = {
     publisherId: number | null;
     publisherName: string | null;
 };
+
+/** Opcje filtrowania gier po kategoriach i wydawcy. */
+export interface GameFilters {
+    categoryIds?: number[];
+    publisherId?: number;
+}
 
 function mapGame(row: GameSelectionRow): Game {
     return {
@@ -52,7 +58,20 @@ function baseGamesQuery(db: Database) {
 
 /** Wszystkie gry posortowane po tytule. */
 export async function getAllGames(db: Database): Promise<Game[]> {
-    const rows = await baseGamesQuery(db).orderBy(asc(games.title));
+    return getGamesByFilters(db, {});
+}
+
+/** Gry spełniające filtry kategorii i wydawcy, posortowane po tytule. */
+export async function getGamesByFilters(db: Database, filters: GameFilters): Promise<Game[]> {
+    const categoryFilter =
+        filters.categoryIds && filters.categoryIds.length > 0
+            ? inArray(games.categoryId, filters.categoryIds)
+            : undefined;
+    const publisherFilter =
+        filters.publisherId !== undefined ? eq(games.publisherId, filters.publisherId) : undefined;
+    const rows = await baseGamesQuery(db)
+        .where(and(categoryFilter, publisherFilter))
+        .orderBy(asc(games.title));
     return rows.map(mapGame);
 }
 
