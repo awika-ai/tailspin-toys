@@ -68,6 +68,10 @@ npm run test:unit   # testy jednostkowe Vitest (transformacje + helpery dostępu
 npm run test:e2e    # testy E2E Playwright (najpierw buduje i serwuje witrynę statyczną)
 ```
 
+## Filtrowanie gier
+
+Na stronie głównej można filtrować gry po jednej lub wielu kategoriach oraz po wydawcy. Filtry można łączyć; wybór kilku kategorii pokazuje gry należące do dowolnej z nich, a wydawca dodatkowo zawęża wyniki. Aktywne filtry są zapisywane w parametrach adresu URL.
+
 ## Lint
 
 Frontend używa ESLinta do pilnowania jakości kodu w plikach TypeScript i Astro:
